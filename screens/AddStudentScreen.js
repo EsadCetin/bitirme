@@ -26,10 +26,12 @@ const AddStudentScreen = ({ navigation, route }) => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const [students, setStudents] = useState([]);
 	const [admin, setAdmin] = useState(true);
+	const [studentName, setStudentName] = useState("");
 
-	const DATA = students.map(({ id, data: { studentEmail } }) => {
+	const DATA = students.map(({ id, data: { name, studentEmail } }) => {
 		return {
 			key: id,
+			name: name,
 			number: studentEmail,
 		};
 	});
@@ -49,6 +51,19 @@ const AddStudentScreen = ({ navigation, route }) => {
 
 		return subscriber;
 	}, []);
+	const getStudentName = async () => {
+		const snapshot = await db
+			.collection("users")
+			.where("studentEmail", "==", student + "@ogr.selcuk.edu.tr")
+			.get();
+
+		snapshot.forEach((doc) => {
+			console.log(doc.id, "=>", doc.data());
+			setStudentName(doc.get("name"));
+			console.log({ studentName });
+		});
+	};
+	getStudentName();
 
 	const addStudent = async () => {
 		if (student == "") {
@@ -58,6 +73,7 @@ const AddStudentScreen = ({ navigation, route }) => {
 				.collection("students")
 				.doc()
 				.set({
+					name: studentName,
 					ownerEmail: auth?.currentUser?.email,
 					roomName: room,
 					studentEmail: student + "@ogr.selcuk.edu.tr",
@@ -101,6 +117,7 @@ const AddStudentScreen = ({ navigation, route }) => {
 					renderItem={({ item }) => (
 						<View>
 							<View style={styles.list}>
+								<Text style={styles.studentNumber}>{item.name}</Text>
 								<Text style={styles.studentNumber}>{item.number}</Text>
 							</View>
 							<TouchableOpacity

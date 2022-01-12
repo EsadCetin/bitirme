@@ -33,8 +33,7 @@ export default StyleSheet.create({
 	},
 	studentNumber: {
 		marginLeft: "6%",
-		marginTop: "3%",
-		fontSize: 18,
+		fontSize: 15,
 		fontFamily: "Poppins",
 	},
 	button: {

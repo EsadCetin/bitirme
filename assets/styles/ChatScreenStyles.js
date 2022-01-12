@@ -7,6 +7,7 @@ export default StyleSheet.create({
 		flex: 1,
 		backgroundColor: "#fff",
 	},
+
 	Header: {
 		flexDirection: "row",
 		width: windowWidth,

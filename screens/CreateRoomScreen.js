@@ -17,6 +17,7 @@ const DismissKeyboard = ({ children }) => (
 const CreateRoomScreen = ({ navigation }) => {
 	const [room, setRoom] = useState("");
 	const [modalVisible, setModalVisible] = useState(false);
+	const [key, setKey] = useState("");
 
 	const createRoom = async () => {
 		if (room == "") {
@@ -25,6 +26,7 @@ const CreateRoomScreen = ({ navigation }) => {
 			await db.collection("rooms").doc().set({
 				ownerEmail: auth?.currentUser?.email,
 				roomName: room,
+				key: key,
 			});
 			navigation.replace("AddStudentScreen", { room });
 		}
@@ -52,6 +54,13 @@ const CreateRoomScreen = ({ navigation }) => {
 						leftIcon={<Icon name="plus" size={24} color="black" />}
 						value={room}
 						onChangeText={(text) => setRoom(text)}
+					/>
+					<Input
+						placeholder="Oda Anahtarı"
+						label="Anahtar"
+						leftIcon={<Icon name="key" size={24} color="black" />}
+						value={key}
+						onChangeText={(text) => setKey(text)}
 					/>
 				</View>
 				<TouchableWithoutFeedback onPress={() => createRoom()}>

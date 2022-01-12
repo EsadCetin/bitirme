@@ -42,8 +42,8 @@ export default StyleSheet.create({
 		textAlign: "center",
 	},
 	studentNumber: {
-		marginLeft: "3%",
-		fontSize: 18,
+		marginLeft: "6%",
+		fontSize: 15,
 		fontFamily: "Poppins",
 	},
 

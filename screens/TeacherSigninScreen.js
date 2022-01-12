@@ -28,6 +28,15 @@ const TeacherSigninScreen = ({ navigation }) => {
 	const [modalVisible2, setModalVisible2] = useState(false);
 	const [modalVisible3, setModalVisible3] = useState(false);
 
+	useEffect(() => {
+		const unsubscribe = auth.onAuthStateChanged((authUser) => {
+			if (authUser) {
+				navigation.replace("HomeScreen", { admin });
+			}
+		});
+		return unsubscribe;
+	}, []);
+
 	const signin = async () => {
 		await auth
 			.signInWithEmailAndPassword(email, password)

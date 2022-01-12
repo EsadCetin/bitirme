@@ -1,13 +1,19 @@
 import React, { useState } from "react";
-import { useEffect } from "react";
-import { Image, Modal, StatusBar, TouchableOpacity } from "react-native";
-import { Keyboard } from "react-native";
-import { Linking } from "react-native";
-import { View, TouchableWithoutFeedback, Text } from "react-native";
-import { Input } from "react-native-elements";
+import {
+	View,
+	Text,
+	TouchableOpacity,
+	Keyboard,
+	TouchableWithoutFeedback,
+	Image,
+	KeyboardAvoidingView,
+} from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import styles from "../assets/styles/SigninScreenStyles";
-import { auth } from "../firebase";
+
+import styles from "../assets/styles/SignupScreenStyles";
+import { Input } from "react-native-elements";
+import { Modal } from "react-native";
+import { auth, db } from "../firebase";
 
 const DismissKeyboard = ({ children }) => (
 	<TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -15,44 +21,56 @@ const DismissKeyboard = ({ children }) => (
 	</TouchableWithoutFeedback>
 );
 
-const SigninScreen = ({ navigation }) => {
+const SignupScreen = ({ navigation }) => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [name, setName] = useState("");
 	const [admin, setAdmin] = useState(false);
+	const [modalVisible, setModalVisible] = useState(false);
 	const [modalVisible1, setModalVisible1] = useState(false);
 	const [modalVisible2, setModalVisible2] = useState(false);
 	const [modalVisible3, setModalVisible3] = useState(false);
 
-	useEffect(() => {
-		const unsubscribe = auth.onAuthStateChanged((authUser) => {
-			if (authUser) {
-				navigation.replace("HomeScreen", { admin });
-			}
-		});
-		return unsubscribe;
-	}, []);
-	const signin = async () => {
-		await auth
-			.signInWithEmailAndPassword(email, password)
-			.then(() => {
-				setAdmin(false);
-				navigation.navigate("HomeScreen", { admin });
-			})
-			.catch((error) => {
-				if (error.code === "auth/invalid-email") {
-					setModalVisible1(true);
-				} else if (error.code === "auth/user-not-found") {
-					setModalVisible2(true);
-				} else if (error.code === "auth/wrong-password") {
-					setModalVisible3(true);
-				}
-			});
+	const signup = async () => {
+		if (name == "") {
+			setModalVisible(true);
+		} else {
+			await auth
+				.createUserWithEmailAndPassword(email, password)
+				.then(() => {
+					setAdmin(false);
+					saveUser();
+					navigation.navigate("HomeScreen", { admin });
+					console.log(auth.currentUser.displayName);
+				})
+				.catch((error) => {
+					if (error.code === "auth/email-already-in-use") {
+						setModalVisible2(true);
+					}
+					if (error.code === "auth/invalid-email") {
+						setModalVisible1(true);
+					}
+					if (error.code === "auth/weak-password") {
+						setModalVisible3(true);
+					}
+				});
+		}
 	};
 
+	const saveUser = async () => {
+		await db.collection("users").doc(auth?.currentUser?.uid).set({
+			studentEmail: email,
+			name: name,
+			userUid: auth.currentUser.uid,
+		});
+	};
 	return (
 		<DismissKeyboard>
-			<View style={styles.container}>
-				<StatusBar />
+			<KeyboardAvoidingView
+				enabled
+				behavior={"position"}
+				style={styles.container}
+			>
 				<Text style={styles.appName}>Okul İçi Mesajlaşma</Text>
 				<TouchableWithoutFeedback
 					onPress={() => {
@@ -83,26 +101,45 @@ const SigninScreen = ({ navigation }) => {
 						onChangeText={(text) => setPassword(text)}
 						secureTextEntry
 					/>
+					<Input
+						placeholder="Adınızı Giriniz"
+						label="Adınız"
+						leftIcon={<Icon name="user" size={24} color="black" />}
+						value={name}
+						onChangeText={(text) => setName(text)}
+					/>
 				</View>
-				<TouchableWithoutFeedback onPress={() => signin()}>
-					<View style={styles.button}>
-						<Text style={styles.text}>Giriş Yap</Text>
-					</View>
-				</TouchableWithoutFeedback>
+
+				<TouchableOpacity style={styles.button} onPress={() => signup()}>
+					<Text style={styles.text}>Kayıt Ol</Text>
+				</TouchableOpacity>
 				<TouchableWithoutFeedback
-					onPress={() => navigation.replace("TeacherSigninScreen")}
+					onPress={() => navigation.replace("SigninScreen")}
 				>
 					<View style={styles.button2}>
-						<Text style={styles.text2}>Öğretim Görevlisi Girişi</Text>
+						<Text style={styles.text2}>Giriş Yap</Text>
 					</View>
 				</TouchableWithoutFeedback>
-				<TouchableWithoutFeedback
-					onPress={() => navigation.replace("SignupScreen")}
+				<Modal
+					animationType="slide"
+					transparent={true}
+					visible={modalVisible}
+					onRequestClose={() => {
+						setModalVisible(!modalVisible);
+					}}
 				>
-					<View style={styles.button2}>
-						<Text style={styles.text2}>Kayıt Ol</Text>
+					<View style={styles.centeredView}>
+						<View style={styles.modalView}>
+							<Text style={styles.modalText}>Adınızı Giriniz</Text>
+							<TouchableOpacity
+								style={[styles.ReadButton]}
+								onPress={() => setModalVisible(!modalVisible)}
+							>
+								<Text style={styles.textStyle}>Tamam</Text>
+							</TouchableOpacity>
+						</View>
 					</View>
-				</TouchableWithoutFeedback>
+				</Modal>
 				<Modal
 					animationType="slide"
 					transparent={true}
@@ -133,7 +170,7 @@ const SigninScreen = ({ navigation }) => {
 				>
 					<View style={styles.centeredView}>
 						<View style={styles.modalView}>
-							<Text style={styles.modalText}>Kullanıcı Bulunamadı</Text>
+							<Text style={styles.modalText}>Kullanıcı zaten mevcut</Text>
 							<TouchableOpacity
 								style={[styles.ReadButton]}
 								onPress={() => setModalVisible2(!modalVisible2)}
@@ -153,7 +190,7 @@ const SigninScreen = ({ navigation }) => {
 				>
 					<View style={styles.centeredView}>
 						<View style={styles.modalView}>
-							<Text style={styles.modalText}>Hatalı Şifre</Text>
+							<Text style={styles.modalText}>Şifre en az 6 haneli olmalı</Text>
 							<TouchableOpacity
 								style={[styles.ReadButton]}
 								onPress={() => setModalVisible3(!modalVisible3)}
@@ -163,9 +200,9 @@ const SigninScreen = ({ navigation }) => {
 						</View>
 					</View>
 				</Modal>
-			</View>
+			</KeyboardAvoidingView>
 		</DismissKeyboard>
 	);
 };
 
-export default SigninScreen;
+export default SignupScreen;

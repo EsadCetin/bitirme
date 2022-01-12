@@ -1,5 +1,4 @@
 import React from "react";
-import { View } from "react-native";
 import { useFonts } from "expo-font";
 import { ActivityIndicator } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
@@ -11,7 +10,10 @@ import ChatScreen from "./screens/ChatScreen";
 import CreateRoomScreen from "./screens/CreateRoomScreen";
 import AddStudentScreen from "./screens/AddStudentScreen";
 import ChatListScreen from "./screens/ChatListScreen";
+import SignupScreen from "./screens/SignupScreen";
+import { View, LogBox } from "react-native";
 
+LogBox.ignoreAllLogs();
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -51,6 +53,11 @@ function MyStack() {
 				name="ChatListScreen"
 				options={{ headerShown: false }}
 				component={ChatListScreen}
+			/>
+			<Stack.Screen
+				name="SignupScreen"
+				options={{ headerShown: false }}
+				component={SignupScreen}
 			/>
 		</Stack.Navigator>
 	);
