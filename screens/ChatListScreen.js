@@ -43,6 +43,14 @@ const ChatListScreen = ({ navigation, route }) => {
 	getTeacherName();
 
 	const deleteRoom = async () => {
+		await db
+			.collection(room)
+			.get()
+			.then(function (querySnapshot) {
+				querySnapshot.forEach(function (doc) {
+					doc.ref.delete();
+				});
+			});
 		await db.collection("rooms").doc(key).delete();
 		await db
 			.collection("students")
