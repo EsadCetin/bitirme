@@ -61,7 +61,7 @@ const ChatListScreen = ({ navigation, route }) => {
 					doc.ref.delete();
 				});
 			});
-		navigation.navigate("HomeScreen", { admin });
+		navigation.push("HomeScreen", { admin });
 	};
 	useEffect(() => {
 		const subscriber = db

@@ -28,7 +28,7 @@ const HomeScreen = ({ route, navigation }) => {
 	const [modalVisible2, setModalVisible2] = useState(false);
 	const [key, setKey] = useState("");
 	const [ownerEmail, setOwnerEmail] = useState("");
-	const [roomName, setRoomName] = useState();
+	const [roomName, setRoomName] = useState(null);
 	const [studentName, setStudentName] = useState("");
 
 	const onSignoutPress = () => {
@@ -102,7 +102,7 @@ const HomeScreen = ({ route, navigation }) => {
 
 			return subscriber;
 		}, []);
-		if (roomName == "") {
+		if (roomName == null) {
 			return (
 				<DismissKeyboard>
 					<View style={styles.container}>
@@ -200,7 +200,7 @@ const HomeScreen = ({ route, navigation }) => {
 
 			return subscriber;
 		}, []);
-		if (roomName == "") {
+		if (roomName == null) {
 			return (
 				<DismissKeyboard>
 					<View style={styles.container}>
