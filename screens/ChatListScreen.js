@@ -37,9 +37,7 @@ const ChatListScreen = ({ navigation, route }) => {
 			.get();
 
 		snapshot.forEach((doc) => {
-			console.log(doc.id, "=>", doc.data());
 			setTeacherName(doc.get("name"));
-			console.log({ teacherName });
 		});
 	};
 	getTeacherName();
@@ -147,7 +145,7 @@ const ChatListScreen = ({ navigation, route }) => {
 					</TouchableOpacity>
 					<View style={styles.textView2}>
 						<Text style={styles.text}>Konuşma Yöneticisi</Text>
-						<Text style={styles.text2}>{owner}</Text>
+						<Text style={styles.text2}>{teacherName}</Text>
 					</View>
 					<View style={styles.textView}>
 						<Text style={styles.text}>Konuşmadaki Öğrenciler</Text>
@@ -157,6 +155,7 @@ const ChatListScreen = ({ navigation, route }) => {
 						renderItem={({ item }) => (
 							<View>
 								<View style={styles.list}>
+									<Text style={styles.studentNumber}>{item.name}</Text>
 									<Text style={styles.studentNumber}>{item.number}</Text>
 								</View>
 							</View>

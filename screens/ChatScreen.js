@@ -11,7 +11,6 @@ import React, {
 	useState,
 } from "react";
 import * as ImagePicker from "expo-image-picker";
-import * as DocumentPicker from "expo-document-picker";
 import { Image } from "react-native";
 
 const ChatScreen = ({ route, navigation }) => {
@@ -33,11 +32,23 @@ const ChatScreen = ({ route, navigation }) => {
 			});
 	};
 	getUser();
+	const getTeacher = async () => {
+		await db
+			.collection("teachers")
+			.doc(auth?.currentUser?.uid)
+			.get()
+			.then(function (doc) {
+				if (doc.exists) {
+					setName(doc.get("name"));
+				}
+			});
+	};
+	getTeacher();
 
 	const renderSend = (props) => (
 		<Send
 			{...props}
-			disabled={!props.text}
+			disabled={false}
 			containerStyle={{
 				width: 44,
 				height: 44,
@@ -104,9 +115,6 @@ const ChatScreen = ({ route, navigation }) => {
 				"Kameradan Çek": () => {
 					openCamera();
 				},
-				"Dosya Seç": () => {
-					pickDocument();
-				},
 				Iptal: () => {},
 			}}
 			optionTintColor="#222B45"
@@ -125,7 +133,6 @@ const ChatScreen = ({ route, navigation }) => {
 		if (!result.cancelled) {
 			setImage(result.uri);
 			console.log({ image });
-			return result.uri;
 		}
 	};
 	useEffect(() => {
@@ -144,19 +151,15 @@ const ChatScreen = ({ route, navigation }) => {
 		const result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
 			allowsEditing: true,
-			aspect: [3, 3],
 			quality: 1,
 		});
 
 		if (!result.cancelled) {
 			setImage(result.uri);
 			console.log({ image });
-			return result.uri;
 		}
 	};
-	const pickDocument = async () => {
-		const result = await DocumentPicker.getDocumentAsync({});
-	};
+
 	useLayoutEffect(() => {
 		const unsubscribe = db
 			.collection(room)
@@ -185,9 +188,10 @@ const ChatScreen = ({ route, navigation }) => {
 			createdAt,
 			text,
 			user,
-			image,
+			image: image,
 		});
 		setImage("");
+		console.log({ image });
 	}, []);
 
 	return (

@@ -32,6 +32,18 @@ export default StyleSheet.create({
 		marginTop: "3%",
 		color: "white",
 	},
+	emptyRoom: {
+		flex: 1,
+		alignItems: "center",
+		alignSelf: "center",
+		justifyContent: "center",
+	},
+	emptyRoomText: {
+		fontSize: 40,
+		textAlign: "center",
+		fontFamily: "Poppins",
+		color: "#26a3e5",
+	},
 	list: {
 		justifyContent: "center",
 		width: windowWidth / 1,
